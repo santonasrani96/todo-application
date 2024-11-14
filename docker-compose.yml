@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  todo-nuxt:
+    build:
+      context: ./TodoNuxt
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - BASE_API_URL=http://localhost:5108/api/
+    depends_on:
+      - todo-dotne
+
+  todo-dotnet:
+    build:
+      context: ./TodoApplication
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    networks:
+      - todo-network
+
+networks:
+  todo-network:
+    driver: bridge
