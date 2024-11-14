@@ -46,6 +46,7 @@ onMounted(() => {
 
 const logout = () => {
   Cookies.remove("token");
+  localStorage.removeItem("user");
   router.push("/");
 };
 </script>

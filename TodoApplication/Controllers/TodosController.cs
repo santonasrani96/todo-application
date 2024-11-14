@@ -20,7 +20,7 @@ namespace TodoApplication.Controllers
         [HttpGet]
         public async Task<ActionResult<List<Todo>>> GetTodos()
         {
-            return Ok(await dbContext.Todos.ToListAsync());
+            return Ok(await dbContext.Todos.OrderBy(todo => todo.ActivitiesNo).ToListAsync());
         }
 
         [HttpGet]

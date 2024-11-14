@@ -3,10 +3,12 @@
     <div class="text-center">
       <div v-if="loading">
         <v-btn class="text-none mt-3" color="green" @click="showFormTodo"
-          >Create a new Task {{ selectedTodos.length }}</v-btn
+          >Create a new Task</v-btn
         >
       </div>
-      <div v-if="todos.length === 0">You do not have any active todos</div>
+      <div class="mt-5" v-if="todos.length === 0">
+        You do not have any active todos
+      </div>
     </div>
     <div class="mt-5 pa-3" v-if="todos.length > 0">
       <v-row>
@@ -44,8 +46,10 @@
         <v-col v-for="(todo, index) in todos" :key="index" cols="3">
           <TodoCardComponent
             :todo="todo"
+            :selectedTodo="selectedTodos.find((t) => t.id === todo.id)"
             @selected="onSelected"
             @update="onUpdate"
+            @delete="onDelete"
           />
         </v-col>
       </v-row>
@@ -62,6 +66,7 @@ import {
   createTodo,
   updateTodo,
   updateBatchStatusTodo,
+  deleteTodo,
 } from "../../libraries/api.ts";
 
 const [todos, user, notify, loading, form, selectedTodos] = [
@@ -93,6 +98,7 @@ const getUserData = () => {
 };
 
 const init = () => {
+  selectedTodos.value = [];
   if (!user.value) {
     notifyConfig.value.message = "User not found";
     notifyConfig.value.color = "red-darken-3";
@@ -104,7 +110,7 @@ const init = () => {
   loading.value.show();
   getTodoByUserId(user.value.id)
     .then((response) => {
-      todos.value = response.data.filter((data) => !data.status);
+      todos.value = response.data.filter((data) => data.status === null);
       if (todos.value.length === 0) {
         notifyConfig.value.message = "You do not have any active todo";
         notifyConfig.value.color = "success";
@@ -124,10 +130,33 @@ const init = () => {
     });
 };
 
-const onSelected = (todoSelected) => {
-  if (todoSelected && todoSelected.length > 0) {
-    selectedTodos.value = todoSelected;
+const onSelected = (todo) => {
+  const todoIndex = selectedTodos.value.findIndex((t) => t.id === todo.id);
+  if (todoIndex > -1) {
+    selectedTodos.value.splice(todoIndex, 1);
+  } else {
+    selectedTodos.value.push(todo);
   }
+};
+
+const onDelete = (todo) => {
+  loading.value.show();
+  deleteTodo(todo.id)
+    .then((response) => {
+      notifyConfig.value.message = "Successfully to delete data";
+      notifyConfig.value.color = "success";
+
+      init();
+    })
+    .catch((err) => {
+      console.log("Failed to call API deleteTodo() ", err);
+      notifyConfig.value.message = "Failed to delete data";
+      notifyConfig.value.color = "red-darken-3";
+    })
+    .finally(() => {
+      notify.value.show();
+      loading.value.hide();
+    });
 };
 
 const onUpdate = (todo) => {

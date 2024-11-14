@@ -6,7 +6,7 @@
     <div v-else>
       <v-row>
         <v-col>
-          <div class="px-3 text-h6 font-weight-bold">Task Done</div>
+          <div class="px-3 text-h6 font-weight-bold">Task Canceled</div>
           <div class="px-3 text-caption text-grey">
             All task canceled are shown here
           </div>

@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using TodoApplication.Data;
 using TodoApplication.Models;
@@ -43,12 +44,23 @@ namespace TodoApplication.Controllers
                 new Claim(ClaimTypes.Name, user.Name)
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.GetSection("Jwt:Token").Value!));
-            var credential = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(GenerateSecretKey()));
+            var credential = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
             var token = new JwtSecurityToken(claims: claims, expires: DateTime.Now.AddDays(1), signingCredentials: credential);
             var jwt = new JwtSecurityTokenHandler().WriteToken(token);
 
             return jwt;
+        }
+
+        public static string GenerateSecretKey(int keySize=256)
+        {
+            byte[] key = new byte[keySize / 8];
+            using(var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(key);
+            }
+
+            return Convert.ToBase64String(key);
         }
     }
 }

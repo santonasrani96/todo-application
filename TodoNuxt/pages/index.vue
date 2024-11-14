@@ -87,7 +87,6 @@ const loginUser = () => {
 
   login(params)
     .then((response) => {
-      console.log(response.data);
       const token = response.data.token;
       const user = response.data.user;
       Cookies.set("token", token, { expires: 1 });

@@ -1,5 +1,5 @@
 <template>
-  <v-card :class="isSelected(_props.todo.id) ? 'bg-green' : ''">
+  <v-card :class="_props.selectedTodo ? 'bg-green' : ''">
     <v-card-title>{{ _props.todo.subject }}</v-card-title>
     <v-card-subtitle>
       <v-chip :color="chipConfig.color" variant="flat" size="x-small">
@@ -9,44 +9,59 @@
     <v-card-text>
       {{ _props.todo.description }}
 
-      <div class="mt-5">
-        <v-btn
-          color="green"
-          class="text-none"
-          variant="flat"
-          block
-          @click="updateTodo(_props.todo)"
-          >Update</v-btn
-        >
-        <v-btn
-          color="green"
-          class="text-none mt-2"
-          variant="flat"
-          block
-          @click="selectTodo(_props.todo)"
-          >{{
-            isSelected(_props.todo.id) ? "Tugas dipilih" : "Pilih Tugas"
-          }}</v-btn
-        >
+      <div class="mt-5 text-center" v-if="_props.todo.status === null">
+        <v-row>
+          <v-col>
+            <v-btn
+              color="info"
+              size="24"
+              variant="flat"
+              density="compact"
+              @click="updateTodo(_props.todo)"
+              ><v-icon icon="mdi-pencil" color="white"></v-icon
+            ></v-btn>
+          </v-col>
+          <v-col>
+            <v-btn
+              color="green"
+              size="24"
+              variant="flat"
+              density="compact"
+              @click="selectTodo(_props.todo)"
+              ><v-icon icon="mdi-target" color="white"></v-icon
+            ></v-btn>
+          </v-col>
+          <v-col>
+            <v-btn
+              color="red"
+              size="24"
+              variant="flat"
+              density="compact"
+              @click="deleteTodo(_props.todo)"
+              ><v-icon icon="mdi-delete" color="white"></v-icon
+            ></v-btn>
+          </v-col>
+        </v-row>
       </div>
     </v-card-text>
   </v-card>
 </template>
 <script setup>
-import { computed, ref, reactive } from "vue";
+import { computed, ref } from "vue";
 
-const _emits = defineEmits(["selected", "update"]);
+const _emits = defineEmits(["selected", "update", "delete"]);
 const _props = defineProps({
   todo: {
+    type: Object,
+    default: null,
+  },
+  selectedTodo: {
     type: Object,
     default: null,
   },
 });
 
 const [selectedTodos] = [ref([])];
-const state = reactive({
-  selectedTodos1: [],
-});
 
 const chipConfig = computed(() => {
   if (!_props.todo.status) {
@@ -67,38 +82,15 @@ const chipConfig = computed(() => {
   }
 });
 
-const isSelected = (todoId) => {
-  if (selectedTodos.value.length === 0) {
-    return false;
-  }
-
-  const todoSelected = selectedTodos.value.find((todo) => todo.id === todoId);
-
-  if (todoSelected) {
-    return true;
-  }
-};
-
 const selectTodo = (todo) => {
-  const todoIndex = selectedTodos.value.findIndex((t) => t.id === todo.id);
-  if (todoIndex > -1) {
-    selectedTodos.value.splice(todoIndex, 1);
-  } else {
-    selectedTodos.value.push(todo);
-  }
-
-  console.log(selectedTodos.value.length);
-
-  _emits("selected", selectedTodos.value);
+  _emits("selected", todo);
 };
-
-const { selectedTodos1 } = toRefs(state);
 
 const updateTodo = (todo) => {
   _emits("update", todo);
 };
 
-// const insertTodo = (todos, todo) => {
-
-// }
+const deleteTodo = (todo) => {
+  _emits("delete", todo);
+};
 </script>

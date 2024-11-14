@@ -90,7 +90,7 @@ namespace TodoApplication.Controllers
 
             await dbContext.SaveChangesAsync();
 
-            return Ok();
+            return Ok(await dbContext.Users.ToListAsync());
         }
     }
 }
