@@ -12,7 +12,7 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["./TodoApplication.csproj", "TodoApplication/"]
+COPY ["TodoApplication/TodoApplication.csproj", "TodoApplication/"]
 RUN dotnet restore "TodoApplication/TodoApplication.csproj"
 COPY . . 
 WORKDIR "/src/TodoApplication"
@@ -27,4 +27,12 @@ RUN dotnet publish "./TodoApplication.csproj" -c $BUILD_CONFIGURATION -o /app/pu
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+
+USER root
+RUN apt-get update && apt-get install -y sqlite3 vim
+COPY /TodoApplication/todo.db /app/todo.db
+RUN chmod 777 /app/todo.db
+
+USER app
+
 ENTRYPOINT ["dotnet", "TodoApplication.dll"]

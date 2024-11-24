@@ -18,11 +18,9 @@ namespace TodoApplication.Controllers
     public class AuthController : ControllerBase
     {
         private readonly ApplicationDbContext dbContext;
-        private readonly IConfiguration configuration;
-        public AuthController(ApplicationDbContext dbContext, IConfiguration configuration)
+        public AuthController(ApplicationDbContext dbContext)
         {
             this.dbContext = dbContext;
-            this.configuration = configuration;
         }
         [HttpPost("login")]
         public async Task<ActionResult<User>> Login(LoginRequestDto loginRequestDto)

@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   todo-nuxt:
+    container_name: todo-nuxt
     build:
       context: ./TodoNuxt
       dockerfile: Dockerfile
@@ -10,14 +11,15 @@ services:
     environment:
       - BASE_API_URL=http://localhost:5108/api/
     depends_on:
-      - todo-dotne
+      - todo-dotnet
 
   todo-dotnet:
+    container_name: todo-dotnet
     build:
-      context: ./TodoApplication
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: TodoApplication/Dockerfile
     ports:
-      - "80:80"
+      - "5108:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     networks:
